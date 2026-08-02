@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联通华盛公司的 AI 之路</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+            padding: 32px 24px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(15, 52, 96, 0.3);
+        }
+        .header h1 { font-size: 36px; margin-bottom: 8px; letter-spacing: 2px; }
+        .header p { font-size: 16px; opacity: 0.85; }
+        .header .subtitle {
+            margin-top: 12px;
+            font-size: 14px;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+            border-top: 4px solid #0f3460;
+        }
+        .metric-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #0f3460;
+            margin: 4px 0;
+        }
+        .metric-label {
+            font-size: 13px;
+            color: #666;
+        }
+        .metric-sub {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8e8e8;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section h2 .icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #0f3460, #533483);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            font-size: 12px;
+        }
+        tr:hover { background: #fafafa; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .bg-blue { background: #e6f4ff; color: #096dd9; }
+        .bg-green { background: #e6f7e6; color: #389e0d; }
+        .bg-orange { background: #fff7e6; color: #d46b08; }
+        .bg-purple { background: #f0e6ff; color: #531dab; }
+        .bg-red { background: #fff1f0; color: #cf1322; }
+        .bg-cyan { background: #e6fffb; color: #08979c; }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0f3460, #533483);
+            border-radius: 3px;
+        }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .insight-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%);
+            padding: 16px;
+            border-radius: 10px;
+            border-left: 4px solid #0f3460;
+        }
+        .insight-card h4 {
+            font-size: 13px;
+            color: #0f3460;
+            margin-bottom: 6px;
+        }
+        .insight-card p {
+            font-size: 12px;
+            color: #555;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #0f3460, #533483);
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding-left: 16px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #0f3460;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #0f3460;
+        }
+        .timeline-item.active::before {
+            background: #e94560;
+            box-shadow: 0 0 0 2px #e94560;
+        }
+        .timeline-date {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .timeline-desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        .arch-card {
+            background: linear-gradient(135deg, #f8f9fa, #fff);
+            border: 1px solid #e8e8e8;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+        .arch-card .arch-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .arch-card h4 {
+            font-size: 14px;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .arch-card p {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .tag {
+            padding: 4px 12px;
+            background: #f0f2f5;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #555;
+        }
+        .tag.hot { background: #fff1f0; color: #cf1322; }
+        .tag.mid { background: #e6f4ff; color: #096dd9; }
+
+        .data-source {
+            margin-top: 16px;
+            padding: 10px 14px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #888;
+            border-left: 3px solid #ccc;
+        }
+        .data-source strong {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>联通华盛公司的 AI 之路</h1>
+            <p>从"想用到会用"到"企业 AI 化"的全景实践</p>
+            <div class="subtitle">
+                <span>📅 数据截至：2026年7月</span>
+                <span>📊 数据来源：数字化部 & 数智办全员统计</span>
+                <span>🎯 架构版本：V1.1</span>
+            </div>
+        </div>
+
+        <!-- 核心指标 -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">数字化部 & 数智办人数</div>
+                <div class="metric-value">46</div>
+                <div class="metric-sub">覆盖 7 个 BU + 创新中心</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">AI 工具使用者</div>
+                <div class="metric-value">40+</div>
+                <div class="metric-sub">占比约 87%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">iData 注册用户</div>
+                <div class="metric-value">105</div>
+                <div class="metric-sub">跨业务条线覆盖</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">iData 总请求</div>
+                <div class="metric-value">32,750</div>
+                <div class="metric-sub">累计数据服务调用</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">iData 日活率</div>
+                <div class="metric-value">74.3<span style="font-size:20px">%</span></div>
+                <div class="metric-sub">用户粘性表现优秀</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">AI 增援申领人数</div>
+                <div class="metric-value">80</div>
+                <div class="metric-sub">已开展 2 场培训</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">AI 进运营案例</div>
+                <div class="metric-value">30</div>
+                <div class="metric-sub">场景化落地实践</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">iData 满意度</div>
+                <div class="metric-value">80.2</div>
+                <div class="metric-sub">百分制评分</div>
+            </div>
+        </div>
+        <div class="data-source">
+            <strong>数据来源：</strong>《数字化部&数智办员工AI工具使用情况统计.xlsx》工作表1（序号1-51行）；《iDATA数据服务使用情况通报.jpg》（核心指标区）；《企业AI运营实践与思考-联通0705参考.pptx》第5页、第18-19页、第26页
+        </div>
+
+        <!-- 组织架构与工具使用 -->
+        <div class="section">
+            <h2><span class="icon">🏢</span> 组织架构与 AI 工具使用情况</h2>
+            <div class="grid-2">
+                <div>
+                    <h3 style="font-size:14px;color:#666;margin-bottom:12px">各 BU 人数分布</h3>
+                    <div class="chart-container">
+                        <canvas id="buChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size:14px;color:#666;margin-bottom:12px">高频 AI 工具 TOP10</h3>
+                    <div class="chart-container">
+                        <canvas id="toolChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="data-source">
+                <strong>数据来源：</strong>《数字化部&数智办员工AI工具使用情况统计.xlsx》工作表1（序号1-51行，各BU人数及工具使用清单）
+            </div>
+        </div>
+
+        <!-- 详细工具使用表 -->
+        <div class="section">
+            <h2><span class="icon">📋</span> 各 BU AI 工具使用明细</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>BU</th>
+                            <th>人数</th>
+                            <th>主要使用工具</th>
+                            <th>特点</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge bg-blue">统筹规划 BU</span></td>
+                            <td>3</td>
+                            <td>WorkBuddy、豆包、DeepSeek、千问、Kimi、秒嗒</td>
+                            <td>工具覆盖广，偏通用型</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-green">创新应用 BU</span></td>
+                            <td>4</td>
+                            <td>WorkBuddy、Trae、Cursor、即梦、豆包、可灵、Claude Code</td>
+                            <td>开发工具使用率高</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-orange">供应链 & 治理 BU</span></td>
+                            <td>7</td>
+                            <td>WorkBuddy、豆包、DeepSeek、千问、Claude Code、QClaw、OpenClaw</td>
+                            <td>Claw 系列工具深度用户</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-purple">数据 BU</span></td>
+                            <td>6</td>
+                            <td>WorkBuddy、DeepSeek、豆包、可灵、即梦、Trae</td>
+                            <td>创意工具使用活跃</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-red">安全 BU</span></td>
+                            <td>4</td>
+                            <td>WorkBuddy、Trae、OpenClaw、Codex、豆包、DeepSeek、GML</td>
+                            <td>编程与 AI 工具并重</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-cyan">建设及运维 BU</span></td>
+                            <td>9</td>
+                            <td>WorkBuddy、豆包、DeepSeek、Trae、Codex、千问、YOYO</td>
+                            <td>人数最多，工具使用最广泛</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-blue">泛智平台 BU</span></td>
+                            <td>4</td>
+                            <td>WorkBuddy、Codex、ChatGPT、OpenClaw、腾讯 ADP、乐享、ima</td>
+                            <td>平台型工具探索活跃</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge bg-green">终端智能创新中心</span></td>
+                            <td>9</td>
+                            <td>WorkBuddy、ChatGPT、Claude、Cursor、DeepSeek、Kimi、Marvis、UniClaw、腾讯 ADP</td>
+                            <td>工具种类最全，前沿探索</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="data-source">
+                <strong>数据来源：</strong>《数字化部&数智办员工AI工具使用情况统计.xlsx》工作表1（序号1-51行，BU/姓名/日常使用的AI工具/下载日期列）
+            </div>
+        </div>
+
+        <!-- AI 运营全家福架构 -->
+        <div class="section">
+            <h2><span class="icon">🏗️</span> AI 运营全家福架构 V1.1</h2>
+            <p style="font-size:13px;color:#666;margin-bottom:16px">
+                以 <strong>iLab</strong> 汇聚共创生态，以 <strong>iPark</strong> 统筹智能体运营，以 <strong>iHub</strong> 打通能力连接，
+                以 <strong>iToken</strong>、<strong>iData</strong>、<strong>iInfra</strong> 夯实基础支撑，以 <strong>iWork</strong> 推动业务落地见效
+            </p>
+            <div class="architecture-grid">
+                <div class="arch-card">
+                    <div class="arch-icon">🧪</div>
+                    <h4>iLab</h4>
+                    <p>共创社区与能力孵化<br>AI增援 · Skill激励 · 交流学习 · 经验沉淀</p>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-icon">🔑</div>
+                    <h4>iToken</h4>
+                    <p>大模型聚合平台<br>元景 · Kimi · MiniMax<br>模型接入 · API调用 · 路由管理</p>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-icon">🔌</div>
+                    <h4>iHub</h4>
+                    <p>可插拔能力空间<br>API网关 · Skill · MCP · A2A · 插件管理</p>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-icon">🎡</div>
+                    <h4>iPark</h4>
+                    <p>智能体运营中心<br>iTools工具广场 · iAgent智能体生态</p>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-icon">💼</div>
+                    <h4>iWork</h4>
+                    <p>AI落地应用<br>AI进服务 · AI进工具 · AI进运营 · AI进终端</p>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-icon">💾</div>
+                    <h4>iData</h4>
+                    <p>数据与知识底座<br>文档解析 · 数据治理 · 知识图谱</p>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-icon">🖥️</div>
+                    <h4>iInfra</h4>
+                    <p>基础设施<br>GPU资源 · 存储资源 · 安全防控</p>
+                </div>
+            </div>
+            <div class="data-source">
+                <strong>数据来源：</strong>《联通华盛公司AI框架.png》V1.1（iLab/iToken/iHub/iPark/iWork/iData/iInfra/业务系统七大模块完整架构）
+            </div>
+        </div>
+
+        <!-- iData 数据服务 -->
+        <div class="section">
+            <h2><span class="icon">📊</span> iData 数据服务使用现状</h2>
+            <div class="grid-2">
+                <div>
+                    <h3 style="font-size:14px;color:#666;margin-bottom:12px">业务主题热度</h3>
+                    <div class="chart-container">
+                        <canvas id="idataTopicChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size:14px;color:#666;margin-bottom:12px">数据来源系统占比</h3>
+                    <div class="chart-container">
+                        <canvas id="idataSourceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:20px">
+                <h3 style="font-size:14px;color:#666;margin-bottom:12px">高频使用数据表 TOP5</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>数据表类型</th>
+                                <th>业务域</th>
+                                <th>特征</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge bg-red">1</span></td>
+                                <td>销售日报/周报/月报类</td>
+                                <td><span class="badge bg-blue">销售</span></td>
+                                <td>请求量最高，日常运营刚需</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-orange">2</span></td>
+                                <td>用户画像标签表</td>
+                                <td><span class="badge bg-green">用户</span></td>
+                                <td>精准营销核心数据支撑</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-purple">3</span></td>
+                                <td>库存周转/供应链明细</td>
+                                <td><span class="badge bg-orange">供应链</span></td>
+                                <td>供应链决策关键依据</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-cyan">4</span></td>
+                                <td>渠道业绩/代理商数据</td>
+                                <td><span class="badge bg-blue">销售</span></td>
+                                <td>渠道管理高频查询</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-blue">5</span></td>
+                                <td>门店热力/分布数据</td>
+                                <td><span class="badge bg-purple">运营</span></td>
+                                <td>环比增长最快（35%）</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="data-source">
+                <strong>数据来源：</strong>《iDATA数据服务使用情况通报.jpg》（核心指标105/32750/74.3%/80.2、数据使用情况、高频使用表TOP10、业务主题热度、来源系统与数据指标、下一步建议）
+            </div>
+        </div>
+
+        <!-- 应用实践 -->
+        <div class="section">
+            <h2><span class="icon">🚀</span> AI 应用实践案例</h2>
+            <div class="insight-grid">
+                <div class="insight-card" style="border-left-color: #e94560;">
+                    <h4 style="color: #e94560;">🤖 AppleClaw 运营智能体</h4>
+                    <p>苹果产品专属智能体。自动更新数据来源、处理数据生成报告；多智能体网络主动洞察；微信/钉钉双渠道交互。核心引擎：DeepSeek V4 Pro + GraphRAG + A2A 网络。</p>
+                </div>
+                <div class="insight-card" style="border-left-color: #533483;">
+                    <h4 style="color: #533483;">🎯 AppleClaw 营销智能体</h4>
+                    <p>AI + 精准营销 —— 联通门店热力图。基于门店数据实时监控、热力分析，实现精准营销投放与门店智能排班优化。</p>
+                </div>
+                <div class="insight-card" style="border-left-color: #0f3460;">
+                    <h4 style="color: #0f3460;">📊 销售部 Agent 平台</h4>
+                    <p>部门级 Agent 平台融入日常办公，数据自动抓取 → 推理规划 → 工具调用 → 知识图谱 → 报告生成。逐渐构建知识图谱，实现销售全流程智能化。</p>
+                </div>
+                <div class="insight-card" style="border-left-color: #389e0d;">
+                    <h4 style="color: #389e0d;">👤 数字分身</h4>
+                    <p>1 个专家 + 5 个 Skill：材料工坊、PPT 引擎、Skill 检查、Skill 管家、行业洞察。产出质量稳定在 80 分，节省大量时间。</p>
+                </div>
+                <div class="insight-card" style="border-left-color: #d46b08;">
+                    <h4 style="color: #d46b08;">📱 产品经理客户智能体</h4>
+                    <p>面向客户服务的专属 Agent，快速响应客户需求，提供产品咨询与问题解决方案。</p>
+                </div>
+                <div class="insight-card" style="border-left-color: #096dd9;">
+                    <h4 style="color: #096dd9;">📦 AI 进运营 30 项案例</h4>
+                    <p>从"小事"开始，从"更多人"和"更多小事"开始。业务驱动、场景驱动：哪里有繁忙，哪里就有自我救赎。持续积累中。</p>
+                </div>
+            </div>
+            <div class="data-source">
+                <strong>数据来源：</strong>《企业AI运营实践与思考-联通0705参考.pptx》第6-13页（部门级Agent平台、AppleClaw运营/营销、产品经理客户智能体、数字分身）；《我的AI之路.md》第三部分（AI为我做的事情）、第二部分（6只虾+1个豆包）
+            </div>
+        </div>
+
+        <!-- 能力建设进展 -->
+        <div class="section">
+            <h2><span class="icon">📈</span> 能力建设进展</h2>
+            <div class="grid-2">
+                <div>
+                    <h3 style="font-size:14px;color:#666;margin-bottom:12px">iLab 社区建设</h3>
+                    <div class="timeline">
+                        <div class="timeline-item active">
+                            <div class="timeline-date">2026年5-7月</div>
+                            <div class="timeline-title">AI 增援计划启动</div>
+                            <div class="timeline-desc">报销 AI 花费，80 人申领，降低试用门槛</div>
+                        </div>
+                        <div class="timeline-item active">
+                            <div class="timeline-date">2026年5-7月</div>
+                            <div class="timeline-title">2 场 AI 培训完成</div>
+                            <div class="timeline-desc">覆盖全员基础 AI 工具使用培训</div>
+                        </div>
+                        <div class="timeline-item active">
+                            <div class="timeline-date">2026年</div>
+                            <div class="timeline-title">第一期智能体大赛启动</div>
+                            <div class="timeline-desc">以赛促学、成果转化</div>
+                        </div>
+                        <div class="timeline-item active">
+                            <div class="timeline-date">2026年5-7月</div>
+                            <div class="timeline-title">AI 专属交流与展会参访</div>
+                            <div class="timeline-desc">走出去 + 引进来，学习行业最佳实践</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">持续</div>
+                            <div class="timeline-title">AI 代表招募与培养</div>
+                            <div class="timeline-desc">找到 AI 带头人，以点带面</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size:14px;color:#666;margin-bottom:12px">Skill 与工具生态</h3>
+                    <div style="margin-bottom:20px">
+                        <p style="font-size:13px;color:#666;margin-bottom:8px">已建 Skill 类型</p>
+                        <div class="tag-cloud">
+                            <span class="tag hot">材料工坊</span>
+                            <span class="tag hot">PPT 引擎</span>
+                            <span class="tag hot">Skill 检查</span>
+                            <span class="tag">Skill 管家</span>
+                            <span class="tag">行业洞察</span>
+                            <span class="tag mid">808green Skill</span>
+                            <span class="tag">审材料</span>
+                            <span class="tag">改材料</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:20px">
+                        <p style="font-size:13px;color:#666;margin-bottom:8px">iTools 工具广场</p>
+                        <div class="tag-cloud">
+                            <span class="tag hot">WorkBuddy</span>
+                            <span class="tag hot">UniClaw</span>
+                            <span class="tag">QClaw</span>
+                            <span class="tag">Hermes</span>
+                            <span class="tag">Marvis</span>
+                            <span class="tag mid">OpenClaw</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p style="font-size:13px;color:#666;margin-bottom:8px">iToken 已接入模型</p>
+                        <div class="tag-cloud">
+                            <span class="tag hot">元景模型</span>
+                            <span class="tag hot">Kimi</span>
+                            <span class="tag">MiniMax</span>
+                            <span class="tag">DeepSeek</span>
+                            <span class="tag">ChatGPT</span>
+                            <span class="tag">Claude</span>
+                            <span class="tag">Gemini</span>
+                            <span class="tag">千问</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="data-source">
+                <strong>数据来源：</strong>《企业AI运营实践与思考-联通0705参考.pptx》第14-26页（能力建设、iLab社区、AI增援计划、智能体大赛、AI代表、Tokens消耗、5-7月交流）；《我的AI之路.md》第四部分（我为AI做的事情）、第五部分（打通的路）
+            </div>
+        </div>
+
+        <!-- 认知与思考 -->
+        <div class="section">
+            <h2><span class="icon">💡</span> 核心认知与思考</h2>
+            <div class="insight-grid">
+                <div class="insight-card">
+                    <h4>1. AI 不只是工具，更是新的思维模式</h4>
+                    <p>有事，找"谁"做？→ 找 AI 做。三个阶段：能用 → 好用 → 原生。</p>
+                </div>
+                <div class="insight-card">
+                    <h4>2. 不是替代人，而是放大人</h4>
+                    <p>替代重复耗时工作，让人做更有价值的事。AI 技术人才 + AI 应用人才组合效果最好。</p>
+                </div>
+                <div class="insight-card">
+                    <h4>3. 信息化 → 数字化 → AI 化</h4>
+                    <p>逐步演进，不要"甩锅"。95% 的 IT 需求可用智能体替代。</p>
+                </div>
+                <div class="insight-card">
+                    <h4>4. 从小事做起、马上就开始</h4>
+                    <p>变化很快，过程本身就有价值。业务驱动、场景驱动：哪里有繁忙，哪里就有自我救赎。</p>
+                </div>
+                <div class="insight-card">
+                    <h4>5. 一把手最重要</h4>
+                    <p>管理层亲自上手，吸引年轻人，寻找"AI 代表"，带动更多人。</p>
+                </div>
+                <div class="insight-card">
+                    <h4>6. 现阶段 = 拨号上网时代</h4>
+                    <p>先学、先用、先新。不要焦虑，用学习和行动化解恐慌。</p>
+                </div>
+            </div>
+            <div class="data-source">
+                <strong>数据来源：</strong>《我的AI之路.md》第六部分（认识和行动/过渡态）；《企业AI运营实践与思考-联通0705参考.pptx》第27-37页（思考心得10条）
+            </div>
+        </div>
+
+        <!-- 行动路线图 -->
+        <div class="section">
+            <h2><span class="icon">🗺️</span> 行动路线图</h2>
+            <div class="grid-3">
+                <div style="background:linear-gradient(135deg,#e6f4ff,#f0f7ff);padding:20px;border-radius:12px">
+                    <h3 style="font-size:16px;color:#096dd9;margin-bottom:12px">📍 第一阶段：会用（当前→3个月）</h3>
+                    <ul style="font-size:12px;color:#555;padding-left:18px;line-height:2">
+                        <li>全员 AI 工具普及，从"会用豆包"开始</li>
+                        <li>每人至少 2 个日常 AI 提效场景</li>
+                        <li>启动个人 + 部门知识库建设</li>
+                        <li>本地虾 + 云虾选型部署</li>
+                        <li>WorkBuddy 完成 2 个以上任务自动化</li>
+                        <li>iData 推广，扩大数据服务覆盖</li>
+                    </ul>
+                </div>
+                <div style="background:linear-gradient(135deg,#e6f7e6,#f0f7f0);padding:20px;border-radius:12px">
+                    <h3 style="font-size:16px;color:#389e0d;margin-bottom:12px">📍 第二阶段：好用（3-6个月）</h3>
+                    <ul style="font-size:12px;color:#555;padding-left:18px;line-height:2">
+                        <li>每人掌握 3-5 个高频 Skill</li>
+                        <li>部门 SkillHub 建立</li>
+                        <li>Agent 平台从试点推广到全部门</li>
+                        <li>管理层 + 核心业务岗位数字分身</li>
+                        <li>iData 全量上线，增加"元"数据</li>
+                        <li>iToken 多模型智能路由</li>
+                        <li>iHub 生态扩展，MCP/A2A 接入</li>
+                    </ul>
+                </div>
+                <div style="background:linear-gradient(135deg,#f0e6ff,#f7f0ff);padding:20px;border-radius:12px">
+                    <h3 style="font-size:16px;color:#531dab;margin-bottom:12px">📍 第三阶段：原生（6-12个月）</h3>
+                    <ul style="font-size:12px;color:#555;padding-left:18px;line-height:2">
+                        <li>核心业务流 AI 原生重塑</li>
+                        <li>A2A 网络覆盖全业务链路</li>
+                        <li>企业 AI 化全家福全公司推广</li>
+                        <li>1 个作战室 + 4 个"四进"小队</li>
+                        <li>内部能力产品化，对外赋能</li>
+                        <li>iLab 生态成熟，可持续运营</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="data-source">
+                <strong>数据来源：</strong>《我的AI之路.md》第七部分（行动清单）；《企业AI运营实践与思考-联通0705参考.pptx》第28-37页（思考心得）
+            </div>
+        </div>
+
+        <!-- 时代演进 -->
+        <div class="section">
+            <h2><span class="icon">⏳</span> AI 时代演进：铁三角</h2>
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;padding:20px 0">
+                <div style="text-align:center;flex:1;min-width:150px">
+                    <div style="font-size:28px;margin-bottom:8px">💡</div>
+                    <div style="font-size:14px;font-weight:600;color:#1a1a2e">2022.11</div>
+                    <div style="font-size:16px;font-weight:700;color:#0f3460;margin:4px 0">ChatGPT</div>
+                    <div style="font-size:12px;color:#888">认知启蒙</div>
+                </div>
+                <div style="font-size:24px;color:#ccc">→</div>
+                <div style="text-align:center;flex:1;min-width:150px">
+                    <div style="font-size:28px;margin-bottom:8px">🛠️</div>
+                    <div style="font-size:14px;font-weight:600;color:#1a1a2e">2023-2024</div>
+                    <div style="font-size:16px;font-weight:700;color:#0f3460;margin:4px 0">AI 工具</div>
+                    <div style="font-size:12px;color:#888">百花齐放</div>
+                </div>
+                <div style="font-size:24px;color:#ccc">→</div>
+                <div style="text-align:center;flex:1;min-width:150px">
+                    <div style="font-size:28px;margin-bottom:8px">🚀</div>
+                    <div style="font-size:14px;font-weight:600;color:#1a1a2e">2025</div>
+                    <div style="font-size:16px;font-weight:700;color:#0f3460;margin:4px 0">DeepSeek</div>
+                    <div style="font-size:12px;color:#888">国产崛起</div>
+                </div>
+                <div style="font-size:24px;color:#ccc">→</div>
+                <div style="text-align:center;flex:1;min-width:150px">
+                    <div style="font-size:28px;margin-bottom:8px">🤖</div>
+                    <div style="font-size:14px;font-weight:600;color:#1a1a2e">2026</div>
+                    <div style="font-size:16px;font-weight:700;color:#e94560;margin:4px 0">OpenClaw</div>
+                    <div style="font-size:12px;color:#888">智能体时代</div>
+                </div>
+            </div>
+            <div class="data-source">
+                <strong>数据来源：</strong>《我的AI之路.md》第六部分（三个时代的特点/铁三角演进表）
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>联通华盛数字化部 & 数智办 | 数据截至 2026年7月</p>
+            <p style="margin-top:4px">基于「我的AI之路」「企业AI运营实践与思考」「数字化部&数智办员工AI工具使用情况统计」「iData数据通报」「AI运营全家福架构」整理</p>
+        </div>
+    </div>
+
+    <script>
+        // BU人数分布 - 基于XLSX真实数据
+        const buCtx = document.getElementById('buChart').getContext('2d');
+        new Chart(buCtx, {
+            type: 'bar',
+            data: {
+                labels: ['建设运维', '终端智能', '供应链', '数据', '创新应用', '泛智平台', '安全', '统筹规划'],
+                datasets: [{
+                    label: '人数',
+                    data: [9, 9, 7, 6, 4, 4, 4, 3],
+                    backgroundColor: [
+                        '#0f3460','#533483','#e94560','#ff6b6b',
+                        '#ffc107','#4caf50','#2196f3','#9c27b0'
+                    ],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f0f0f0' }, ticks: { stepSize: 1 } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 高频工具TOP10 - 基于XLSX统计
+        const toolCtx = document.getElementById('toolChart').getContext('2d');
+        new Chart(toolCtx, {
+            type: 'bar',
+            data: {
+                labels: ['WorkBuddy', '豆包', 'DeepSeek', '千问', 'Kimi', 'Trae', 'Claude Code', '即梦', 'Codex', 'OpenClaw'],
+                datasets: [{
+                    label: '使用人数',
+                    data: [35, 30, 25, 20, 18, 12, 10, 9, 8, 7],
+                    backgroundColor: '#0f3460',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // iData业务主题热度
+        const idataTopicCtx = document.getElementById('idataTopicChart').getContext('2d');
+        new Chart(idataTopicCtx, {
+            type: 'bar',
+            data: {
+                labels: ['销售', '用户', '供应链', '运营', '财务', '门店', '产品'],
+                datasets: [{
+                    label: '请求占比(%)',
+                    data: [39, 25, 20, 13, 10, 9, 5],
+                    backgroundColor: [
+                        '#0f3460','#533483','#e94560','#ff6b6b',
+                        '#ffc107','#4caf50','#9c27b0'
+                    ],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // iData数据来源
+        const idataSourceCtx = document.getElementById('idataSourceChart').getContext('2d');
+        new Chart(idataSourceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['华盛通', '供应链系统', '自助报表', '门店系统', '财务系统', '其他'],
+                datasets: [{
+                    data: [35, 22, 18, 12, 8, 5],
+                    backgroundColor: ['#0f3460','#533483','#e94560','#ffc107','#4caf50','#9e9e9e'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { padding: 12, font: { size: 11 } } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
